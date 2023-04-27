@@ -36,6 +36,8 @@ import { FormsModule } from '@angular/forms';
       
     </div>
 
+    <div>Quantidade total de produtos: {{qtyTotalProds()}}</div>
+
   `,
 })
 export class App {
@@ -53,6 +55,15 @@ export class App {
 
   exPrice = computed(() => this.selectedVehicle().price * this.quantity());
   color = computed(() => (this.exPrice() > 50000 ? 'green' : 'blue'));
+  qtyTotalProds = computed(() => {
+    console.log('qtyTotalProds: ', this.products());
+    return this.products().reduce(
+      (prev, curr) => Number(prev) + curr.quantity,
+      0
+    );
+  });
+
+  teste = effect(() => console.log('Total Prods: ', this.qtyTotalProds()));
 
   constructor() {
     console.log(this.quantity());
@@ -85,8 +96,11 @@ export class App {
   }
 
   updateQuantityHandler(newQty: string, id: number) {
-    console.log(newQty, id);
-    this.products().find((p) => p.id === id).quantity = Number(newQty);
+    this.products.update((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, quantity: Number(newQty) } : item
+      )
+    );
   }
 }
 
